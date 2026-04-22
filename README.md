@@ -3,7 +3,6 @@
 A web-based database system for managing the complete lifecycle of a sports tournament — from team registration and fixture scheduling to result recording and standings calculation.
 
 > **Course:** CS 2005 — Database Systems | FAST-NUCES | Spring 2026  
-> **Instructor:** Basit Jasani
 
 ---
 
