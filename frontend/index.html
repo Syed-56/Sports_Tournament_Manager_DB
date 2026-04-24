@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TournaPro — Sports Tournament Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-badge">
+        <div class="logo-icon">⚽</div>
+        <div class="logo-text">Tourna<span>Pro</span></div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="navigate('dashboard', this)"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="navigate('fixtures', this)"><span class="icon">📅</span> Fixtures</div>
+      <div class="nav-item" onclick="navigate('standings', this)"><span class="icon">📋</span> Standings</div>
+      <div class="nav-item" onclick="navigate('bracket', this)"><span class="icon">🏆</span> Bracket</div>
+      <div class="nav-section">Manage</div>
+      <div class="nav-item" onclick="navigate('teams', this)"><span class="icon">👥</span> Teams <span class="nav-badge" id="team-count-badge">8</span></div>
+      <div class="nav-item" onclick="navigate('players', this)"><span class="icon">🏃</span> Players</div>
+      <div class="nav-item" onclick="navigate('venues', this)"><span class="icon">🏟️</span> Venues</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">AD</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">Tournament Manager</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="topbar-title">Dashboard <span>/ Spring Cup 2026</span></div>
+      <div class="topbar-actions" id="topbar-actions">
+        <button class="btn btn-ghost" onclick="showToast('📤 Export coming soon')">📤 Export</button>
+        <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats">
+          <div class="stat-card" style="--accent: var(--green);">
+            <div class="stat-label">Teams Registered</div>
+            <div class="stat-value" id="stat-teams">8</div>
+            <div class="stat-sub">2 groups of 4</div>
+            <div class="stat-icon">👥</div>
+          </div>
+          <div class="stat-card" style="--accent: var(--gold);">
+            <div class="stat-label">Matches Played</div>
+            <div class="stat-value" id="stat-played">12</div>
+            <div class="stat-sub" id="stat-played-sub">of 24 total</div>
+            <div class="stat-icon">⚽</div>
+          </div>
+          <div class="stat-card" style="--accent: #e84b4b;">
+            <div class="stat-label">Goals Scored</div>
+            <div class="stat-value" id="stat-goals">31</div>
+            <div class="stat-sub" id="stat-goals-sub">2.6 per match avg</div>
+            <div class="stat-icon">🥅</div>
+          </div>
+          <div class="stat-card" style="--accent: #a78bfa;">
+            <div class="stat-label">Days Remaining</div>
+            <div class="stat-value">14</div>
+            <div class="stat-sub">Final: Apr 2, 2026</div>
+            <div class="stat-icon">📅</div>
+          </div>
+        </div>
+
+        <div class="grid-3-1 mb18">
+          <!-- STANDINGS MINI -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Group A Standings</div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="navigate('standings', document.querySelector('[onclick*=standings]'))">All Groups →</button>
+            </div>
+            <table class="standings-table" id="dash-standings"></table>
+          </div>
+          <!-- TOP SCORERS -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Top Scorers</div></div>
+            <div id="dash-scorers"></div>
+          </div>
+        </div>
+
+        <!-- FIXTURES MINI -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent & Upcoming Fixtures</div>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="navigate('fixtures', document.querySelector('[onclick*=fixtures]'))">View All →</button>
+          </div>
+          <div id="dash-fixtures"></div>
+        </div>
+      </div>
+
+      <!-- ── FIXTURES PAGE ── -->
+      <div class="page" id="page-fixtures">
+        <div class="search-bar">
+          <input class="search-input" placeholder="🔍  Search by team or venue..." id="fixture-search" oninput="renderFixturesPage()">
+          <select class="filter-select" id="fixture-filter" onchange="renderFixturesPage()">
+            <option value="all">All Matches</option>
+            <option value="played">Played</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="live">Live</option>
+          </select>
+          <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>
+        </div>
+        <div class="card">
+          <div id="fixtures-list"></div>
+        </div>
+      </div>
+
+      <!-- ── STANDINGS PAGE ── -->
+      <div class="page" id="page-standings">
+        <div class="group-pills" id="group-pills">
+          <div class="pill active" onclick="selectGroup('A', this)">Group A</div>
+          <div class="pill" onclick="selectGroup('B', this)">Group B</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="standings-group-title">Group A Standings</div>
+          </div>
+          <table class="standings-table" id="full-standings"></table>
+        </div>
+      </div>
+
+      <!-- ── BRACKET PAGE ── -->
+      <div class="page" id="page-bracket">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🏆 Knockout Bracket — Spring Cup 2026</div></div>
+          <div class="bracket-wrap">
+            <div class="bracket" id="bracket-view"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TEAMS PAGE ── -->
+      <div class="page" id="page-teams">
+        <div class="search-bar">
+          <input class="search-input" placeholder="🔍  Search teams..." id="team-search" oninput="renderTeamsPage()">
+          <button class="btn btn-gold" onclick="openModal('add-team-modal')">+ Add Team</button>
+        </div>
+        <div class="teams-grid" id="teams-grid"></div>
+      </div>
+
+      <!-- ── PLAYERS PAGE ── -->
+      <div class="page" id="page-players">
+        <div class="search-bar">
+          <input class="search-input" placeholder="🔍  Search players..." id="player-search" oninput="renderPlayersPage()">
+          <select class="filter-select" id="player-team-filter" onchange="renderPlayersPage()">
+            <option value="all">All Teams</option>
+          </select>
+          <select class="filter-select" id="player-pos-filter" onchange="renderPlayersPage()">
+            <option value="all">All Positions</option>
+            <option value="FW">Forward</option>
+            <option value="MF">Midfielder</option>
+            <option value="DF">Defender</option>
+            <option value="GK">Goalkeeper</option>
+          </select>
+          <button class="btn btn-gold" onclick="openModal('add-player-modal')">+ Add Player</button>
+        </div>
+        <div class="card">
+          <table class="players-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Team</th>
+                <th>Position</th>
+                <th>Goals</th>
+                <th>Assists</th>
+                <th>Matches</th>
+              </tr>
+            </thead>
+            <tbody id="players-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── VENUES PAGE ── -->
+      <div class="page" id="page-venues">
+        <div class="venues-grid" id="venues-grid"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── MODAL: Record Match Result ── -->
+<div class="modal-overlay" id="match-modal" onclick="closeModalOutside(event, 'match-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">⚽ Record Match Result</div>
+      <button class="modal-close" onclick="closeModal('match-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Fixture</label>
+        <select class="form-select" id="result-fixture-select" onchange="updateResultTeams()"></select>
+      </div>
+      <div class="result-teams" id="result-teams-display">
+        <div class="result-team">
+          <div class="result-team-name" id="result-home-name">Home Team</div>
+          <input type="number" class="score-input" id="result-home-score" value="0" min="0" max="20">
+        </div>
+        <div class="result-vs">VS</div>
+        <div class="result-team">
+          <div class="result-team-name" id="result-away-name">Away Team</div>
+          <input type="number" class="score-input" id="result-away-score" value="0" min="0" max="20">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Venue</label>
+        <select class="form-select" id="result-venue-select"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('match-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitResult()">Save Result</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Add Team ── -->
+<div class="modal-overlay" id="add-team-modal" onclick="closeModalOutside(event, 'add-team-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👥 Add New Team</div>
+      <button class="modal-close" onclick="closeModal('add-team-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Team Name</label>
+        <input class="form-input" id="new-team-name" placeholder="e.g. Peshawar XI">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Group</label>
+          <select class="form-select" id="new-team-group">
+            <option value="A">Group A</option>
+            <option value="B">Group B</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Team Color</label>
+          <select class="form-select" id="new-team-color">
+            <option value="#22a050">Green</option>
+            <option value="#e8b84b">Gold</option>
+            <option value="#3b8bd4">Blue</option>
+            <option value="#e84b4b">Red</option>
+            <option value="#a78bfa">Purple</option>
+            <option value="#f97316">Orange</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-team-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addTeam()">Add Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Add Player ── -->
+<div class="modal-overlay" id="add-player-modal" onclick="closeModalOutside(event, 'add-player-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏃 Add New Player</div>
+      <button class="modal-close" onclick="closeModal('add-player-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="new-player-name" placeholder="e.g. Ali Hassan">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jersey #</label>
+          <input class="form-input" id="new-player-jersey" type="number" placeholder="10" min="1" max="99">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Team</label>
+          <select class="form-select" id="new-player-team"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Position</label>
+          <select class="form-select" id="new-player-pos">
+            <option value="FW">Forward</option>
+            <option value="MF">Midfielder</option>
+            <option value="DF">Defender</option>
+            <option value="GK">Goalkeeper</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-player-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addPlayer()">Add Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toast-msg">✅ Saved successfully</span>
+</div>
+<script src="script.js" defer></script>
+</body>
+</html>
