@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TournaPro — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1a7a3e; --green-light: #22a050; --green-dark: #0f4d26;
+  --gold: #e8b84b; --bg: #0d1117; --surface: #161c26;
+  --surface2: #1e2736; --border: rgba(255,255,255,0.07);
+  --text: #e8edf5; --muted: #6b7a94; --red: #e84b4b; --blue: #3b8bd4;
+}
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 60px);
+  pointer-events: none; z-index: 0;
+}
+.glow {
+  position: fixed; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,122,62,0.12) 0%, transparent 70%);
+  top: -200px; left: -200px; pointer-events: none; z-index: 0;
+}
+.glow2 {
+  position: fixed; width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,184,75,0.06) 0%, transparent 70%);
+  bottom: -100px; right: -100px; pointer-events: none; z-index: 0;
+}
+.login-wrap {
+  position: relative; z-index: 1;
+  width: 440px; max-width: 95vw;
+  animation: fadeUp 0.5s ease both;
+}
+.logo-area { text-align: center; margin-bottom: 36px; }
+.logo-badge { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.logo-icon {
+  width: 40px; height: 40px; background: var(--green);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; box-shadow: 0 0 20px rgba(26,122,62,0.4);
+}
+.logo-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 22px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.logo-text span { color: var(--gold); }
+.logo-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+#step-role { display: block; }
+#step-details { display: none; }
+.step-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); text-align: center; margin-bottom: 16px;
+}
+.role-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.role-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 12px; padding: 20px 12px;
+  text-align: center; cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.role-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+.role-card.selected { border-color: var(--green-light); background: rgba(26,122,62,0.12); }
+.role-icon { font-size: 28px; margin-bottom: 8px; display: block; transition: transform 0.2s; }
+.role-card.selected .role-icon { transform: scale(1.1); }
+.role-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.05em; display: block; margin-bottom: 4px;
+}
+.role-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.btn-continue {
+  width: 100%; padding: 12px; border-radius: 10px;
+  background: var(--green); color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; border: none; cursor: pointer;
+  transition: all 0.2s; opacity: 0.4; pointer-events: none;
+}
+.btn-continue.active { opacity: 1; pointer-events: all; }
+.btn-continue.active:hover { background: var(--green-light); transform: translateY(-1px); }
+.detail-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.detail-header {
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.selected-role-badge {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(26,122,62,0.2); border: 1px solid var(--green);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.detail-header-text .title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.detail-header-text .sub { font-size: 11px; color: var(--muted); }
+.detail-body { padding: 22px; }
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;
+}
+.form-input {
+  width: 100%; padding: 10px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px;
+  font-family: 'Barlow', sans-serif; outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--green); }
+.form-input::placeholder { color: var(--muted); }
+.btn-login {
+  width: 100%; padding: 12px; border-radius: 10px;
+  background: var(--gold); color: #000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; border: none; cursor: pointer; transition: all 0.2s;
+}
+.btn-login:hover { background: #f0c860; transform: translateY(-1px); }
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--muted);
+  font-size: 12px; cursor: pointer; font-family: 'Barlow', sans-serif;
+  padding: 0 0 16px; transition: color 0.15s;
+}
+.back-btn:hover { color: var(--text); }
+@keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+@keyframes stepIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
+.step-anim { animation: stepIn 0.3s ease both; }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="glow2"></div>
+<div class="login-wrap">
+  <div class="logo-area">
+    <div class="logo-badge">
+      <div class="logo-icon">⚽</div>
+      <div class="logo-text">Tourna<span>Pro</span></div>
+    </div>
+    <div class="logo-sub">Spring Cup 2026</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step-role">
+    <div class="step-title">Sign in as</div>
+    <div class="role-cards">
+      <div class="role-card" onclick="selectRole('admin', this)">
+        <span class="role-icon">🛡️</span>
+        <span class="role-name">Admin</span>
+        <span class="role-desc">Full tournament control</span>
+      </div>
+      <div class="role-card" onclick="selectRole('referee', this)">
+        <span class="role-icon">🟨</span>
+        <span class="role-name">Referee</span>
+        <span class="role-desc">Record match results</span>
+      </div>
+      <div class="role-card" onclick="selectRole('captain', this)">
+        <span class="role-icon">🏅</span>
+        <span class="role-name">Captain</span>
+        <span class="role-desc">Manage your team</span>
+      </div>
+    </div>
+    <button class="btn-continue" id="btn-continue" onclick="goToDetails()">Continue →</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step-details">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="selected-role-badge" id="detail-icon">🛡️</div>
+        <div class="detail-header-text">
+          <div class="title" id="detail-role-title">Administrator</div>
+          <div class="sub">Enter your credentials to continue</div>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" id="input-name" type="text" placeholder="e.g. Ali Hassan" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" id="input-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn-login" onclick="doLogin()">Sign In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedRole = null;
+const roleInfo = {
+  admin:   { icon: '🛡️', title: 'Administrator' },
+  referee: { icon: '🟨', title: 'Referee' },
+  captain: { icon: '🏅', title: 'Team Captain' },
+};
+
+function selectRole(role, el) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole = role;
+  document.getElementById('btn-continue').classList.add('active');
+}
+
+function goToDetails() {
+  if (!selectedRole) return;
+  document.getElementById('step-role').style.display = 'none';
+  const step2 = document.getElementById('step-details');
+  step2.style.display = 'block';
+  step2.querySelector('.detail-card').classList.remove('step-anim');
+  void step2.querySelector('.detail-card').offsetWidth;
+  step2.querySelector('.detail-card').classList.add('step-anim');
+  document.getElementById('detail-icon').textContent = roleInfo[selectedRole].icon;
+  document.getElementById('detail-role-title').textContent = roleInfo[selectedRole].title;
+  document.getElementById('input-name').focus();
+}
+
+function goBack() {
+  document.getElementById('step-details').style.display = 'none';
+  document.getElementById('step-role').style.display = 'block';
+}
+
+function doLogin() {
+  const name = document.getElementById('input-name').value.trim();
+  const pass = document.getElementById('input-password').value;
+  if (!name) { document.getElementById('input-name').focus(); return; }
+  if (!pass)  { document.getElementById('input-password').focus(); return; }
+  localStorage.setItem('tp_user', JSON.stringify({ name, role: selectedRole }));
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

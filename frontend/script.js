@@ -1,3 +1,13 @@
+// ── AUTH GUARD ──
+const _user = JSON.parse(localStorage.getItem('tp_user') || 'null');
+if (!_user) window.location.href = 'login.html';
+
+// ── POPULATE USER INFO ──
+const roleLabels = { admin: 'Tournament Manager', referee: 'Referee', captain: 'Team Captain' };
+document.getElementById('user-avatar').textContent = _user.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('user-name').textContent = _user.name;
+document.getElementById('user-role').textContent = roleLabels[_user.role] || _user.role;
+
 const teams = [
   { id:1, name:'FC Karachi',    group:'A', color:'#22a050', emoji:'🟢', w:5,d:1,l:0,gf:14,ga:5 },
   { id:2, name:'Lahore Lions',  group:'A', color:'#e8b84b', emoji:'🟡', w:3,d:2,l:1,gf:10,ga:6 },
