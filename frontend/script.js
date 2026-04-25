@@ -233,6 +233,18 @@ function navigate(page, el) {
   };
   document.getElementById('topbar-title').innerHTML = titles[page] || page;
 
+  const actions = {
+    dashboard: `<button class="btn btn-ghost" onclick="showToast('📤 Export coming soon')">📤 Export</button>
+                <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
+    fixtures:  `<button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
+    teams:     `<button class="btn btn-gold" onclick="openModal('add-team-modal')">+ Add Team</button>`,
+    players:   `<button class="btn btn-gold" onclick="openModal('add-player-modal')">+ Add Player</button>`,
+    standings: ``,
+    bracket:   ``,
+    venues:    ``,
+  };
+  document.getElementById('topbar-actions').innerHTML = actions[page] || '';
+
   if(page === 'dashboard')  renderDashboard();
   if(page === 'fixtures')   renderFixturesPage();
   if(page === 'standings')  renderStandingsPage();
@@ -477,6 +489,7 @@ function submitResult() {
   recalcTeamStats();
   showToast(`✅ Result recorded: ${getTeam(f.home).name} ${hg}–${ag} ${getTeam(f.away).name}`);
   renderDashboard();
+  renderFixturesPage();
 }
 
 function populatePlayerModal() {
