@@ -8,6 +8,50 @@ document.getElementById('user-avatar').textContent = _user.name.split(' ').map(n
 document.getElementById('user-name').textContent = _user.name;
 document.getElementById('user-role').textContent = roleLabels[_user.role] || _user.role;
 
+
+// ── ROLE-BASED ACCESS ──
+function applyRoleAccess() {
+  const role = _user.role;
+
+  // Define which nav items each role can see
+  const navAccess = {
+    admin:   ['dashboard', 'fixtures', 'standings', 'bracket', 'teams', 'players', 'venues'],
+    referee: ['fixtures'],
+    captain: ['standings', 'teams', 'players'],
+  };
+
+  // Hide nav items the role can't access
+  document.querySelectorAll('.nav-item[onclick]').forEach(item => {
+    const page = item.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+    if (page && !navAccess[role].includes(page)) {
+      item.style.display = 'none';
+    }
+  });
+    // Hide/show topbar buttons
+  const recordBtn = document.querySelector('.btn-gold[onclick*="match-modal"]');
+  const exportBtn = document.querySelector('.btn-ghost[onclick*="Export"]');
+
+  if (role === 'referee') {
+    // Referee: only sees the Record Result button, no export
+    if (exportBtn) exportBtn.style.display = 'none';
+  }
+
+  if (role === 'captain') {
+    // Captain: no record result, no export
+    if (recordBtn) recordBtn.style.display = 'none';
+    if (exportBtn) exportBtn.style.display = 'none';
+  }
+
+  // Redirect to the correct landing page based on role
+  const landingPage = {
+    admin:   'dashboard',
+    referee: 'fixtures',
+    captain: 'standings',
+  };
+
+  navigate(landingPage[role], document.querySelector(`[onclick*="${landingPage[role]}"]`));
+}
+
 const teams = [
   { id:1, name:'FC Karachi',    group:'A', color:'#22a050', emoji:'🟢', w:5,d:1,l:0,gf:14,ga:5 },
   { id:2, name:'Lahore Lions',  group:'A', color:'#e8b84b', emoji:'🟡', w:3,d:2,l:1,gf:10,ga:6 },
@@ -229,6 +273,8 @@ function renderFixturesPage() {
   document.getElementById('fixtures-list').innerHTML = list.length
     ? list.map(fixtureRowHTML).join('')
     : `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No fixtures found</div></div>`;
+  document.querySelector('#page-fixtures .btn-gold').style.display =
+    (_user.role === 'admin' || _user.role === 'referee') ? '' : 'none';
 }
 
 // ── STANDINGS PAGE ──
@@ -316,6 +362,8 @@ function renderTeamsPage() {
     </div>`;
   }).join('') || `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-text">No teams found</div></div>`;
   document.getElementById('team-count-badge').textContent = teams.length;
+  document.querySelector('[onclick*="add-team-modal"]').style.display =
+    _user.role === 'admin' ? '' : 'none';
 }
 
 // ── PLAYERS PAGE ──
@@ -352,6 +400,8 @@ function renderPlayersPage() {
       <td style="color:var(--muted)">${p.matches}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏃</div><div class="empty-text">No players found</div></div></td></tr>`;
+  document.querySelector('[onclick*="add-player-modal"]').style.display =
+    _user.role === 'admin' ? '' : 'none';
 }
 
 // ── VENUES PAGE ──
@@ -475,3 +525,9 @@ function showToast(msg, isError=false) {
 // ── INIT ──
 recalcTeamStats();
 renderDashboard();
+function logout() {
+  localStorage.removeItem('tp_user');
+  window.location.href = 'index.html';
+}
+
+applyRoleAccess();
