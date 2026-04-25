@@ -115,3 +115,5 @@ CREATE TABLE Goal (
     FOREIGN KEY (match_id)  REFERENCES T_Match(match_id),
     FOREIGN KEY (player_id) REFERENCES Player(player_id)
 );
+
+SHOW TABLES;
