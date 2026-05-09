@@ -52,54 +52,11 @@ function applyRoleAccess() {
   navigate(landingPage[role], document.querySelector(`[onclick*="${landingPage[role]}"]`));
 }
 
-const teams = [
-  { id:1, name:'FC Karachi',    group:'A', color:'#22a050', emoji:'🟢', w:5,d:1,l:0,gf:14,ga:5 },
-  { id:2, name:'Lahore Lions',  group:'A', color:'#e8b84b', emoji:'🟡', w:3,d:2,l:1,gf:10,ga:6 },
-  { id:3, name:'Islamabad FC',  group:'A', color:'#3b8bd4', emoji:'🔵', w:2,d:1,l:3,gf:7,ga:9 },
-  { id:4, name:'Quetta United', group:'A', color:'#e84b4b', emoji:'🔴', w:0,d:2,l:4,gf:4,ga:15 },
-  { id:5, name:'Peshawar XI',   group:'B', color:'#a78bfa', emoji:'🟣', w:4,d:1,l:1,gf:11,ga:7 },
-  { id:6, name:'Multan City',   group:'B', color:'#f97316', emoji:'🟠', w:3,d:2,l:1,gf:9,ga:6 },
-  { id:7, name:'Faisalabad FC', group:'B', color:'#22a050', emoji:'🟢', w:2,d:0,l:4,gf:6,ga:12 },
-  { id:8, name:'Sialkot Stars', group:'B', color:'#e84b4b', emoji:'🔴', w:1,d:1,l:4,gf:5,ga:10 },
-];
-
-const players = [
-  { id:1,name:'Ahmed Khan',    jersey:9,  team:1, pos:'FW', goals:9,  assists:3, matches:6 },
-  { id:2,name:'Saad Raza',     jersey:10, team:2, pos:'FW', goals:7,  assists:2, matches:6 },
-  { id:3,name:'Usman Butt',    jersey:7,  team:3, pos:'MF', goals:5,  assists:4, matches:6 },
-  { id:4,name:'Faisal Malik',  jersey:11, team:4, pos:'FW', goals:4,  assists:1, matches:5 },
-  { id:5,name:'Hamza Tariq',   jersey:8,  team:5, pos:'MF', goals:6,  assists:5, matches:6 },
-  { id:6,name:'Bilal Nawaz',   jersey:5,  team:6, pos:'DF', goals:1,  assists:2, matches:6 },
-  { id:7,name:'Shahid Afridi', jersey:1,  team:7, pos:'GK', goals:0,  assists:0, matches:6 },
-  { id:8,name:'Rizwan Haider', jersey:6,  team:8, pos:'DF', goals:2,  assists:1, matches:5 },
-  { id:9,name:'Omar Sheikh',   jersey:4,  team:1, pos:'DF', goals:1,  assists:3, matches:6 },
-  { id:10,name:'Zain Abbas',   jersey:3,  team:2, pos:'MF', goals:3,  assists:4, matches:6 },
-];
-
-const venues = [
-  { id:1, name:'National Stadium',  city:'Karachi',   capacity:34228, grass:'Natural',  emoji:'🏟️', color:'#1a3a2a' },
-  { id:2, name:'Gaddafi Stadium',   city:'Lahore',    capacity:27000, grass:'Natural',  emoji:'⚽', color:'#2a2a1a' },
-  { id:3, name:'Rawalpindi Bowl',   city:'Rawalpindi',capacity:15000, grass:'Hybrid',   emoji:'🟢', color:'#1a2a3a' },
-  { id:4, name:'Arbab Niaz Stadium',city:'Peshawar',  capacity:15000, grass:'Artificial',emoji:'🏆',color:'#2a1a3a' },
-];
-
-const fixtures = [
-  { id:1,  home:1, away:4, hg:3, ag:1, venue:1, date:'Mar 15', status:'played' },
-  { id:2,  home:2, away:3, hg:2, ag:2, venue:2, date:'Mar 16', status:'played' },
-  { id:3,  home:5, away:8, hg:2, ag:0, venue:4, date:'Mar 16', status:'played' },
-  { id:4,  home:6, away:7, hg:1, ag:1, venue:3, date:'Mar 17', status:'played' },
-  { id:5,  home:1, away:3, hg:2, ag:0, venue:1, date:'Mar 18', status:'played' },
-  { id:6,  home:2, away:4, hg:3, ag:1, venue:2, date:'Mar 18', status:'played' },
-  { id:7,  home:5, away:7, hg:3, ag:1, venue:4, date:'Mar 19', status:'played' },
-  { id:8,  home:6, away:8, hg:2, ag:1, venue:3, date:'Mar 19', status:'played' },
-  { id:9,  home:3, away:4, hg:1, ag:2, venue:1, date:'Mar 19', status:'played' },
-  { id:10, home:1, away:2, hg:1, ag:1, venue:1, date:'Mar 19', status:'played' },
-  { id:11, home:5, away:6, hg:null, ag:null, venue:4, date:'Mar 19', status:'live', min:67 },
-  { id:12, home:1, away:2, hg:null, ag:null, venue:1, date:'Mar 20', status:'upcoming' },
-  { id:13, home:3, away:4, hg:null, ag:null, venue:3, date:'Mar 22', status:'upcoming' },
-  { id:14, home:5, away:8, hg:null, ag:null, venue:4, date:'Mar 24', status:'upcoming' },
-  { id:15, home:6, away:7, hg:null, ag:null, venue:2, date:'Mar 24', status:'upcoming' },
-];
+// ── DATA (populated from Flask API) ──
+let teams    = [];
+let players  = [];
+let venues   = [];
+let fixtures = [];
 
 // ── HELPERS ──
 function getTeam(id) { return teams.find(t => t.id === id); }
@@ -133,16 +90,7 @@ function topScorers(n=5) {
 }
 
 function recalcTeamStats() {
-  // reset
-  teams.forEach(t => { t.w=0; t.d=0; t.l=0; t.gf=0; t.ga=0; });
-  fixtures.filter(f=>f.status==='played').forEach(f => {
-    const h = getTeam(f.home), a = getTeam(f.away);
-    h.gf += f.hg; h.ga += f.ag;
-    a.gf += f.ag; a.ga += f.hg;
-    if(f.hg > f.ag){ h.w++; a.l++; }
-    else if(f.hg < f.ag){ a.w++; h.l++; }
-    else { h.d++; a.d++; }
-  });
+  // Stats now come from DB via /api/standings/ — this is a no-op kept for compatibility.
 }
 
 // ── RENDER HELPERS ──
@@ -236,12 +184,12 @@ function navigate(page, el) {
   const actions = {
     dashboard: `<button class="btn btn-ghost" onclick="showToast('📤 Export coming soon')">📤 Export</button>
                 <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
-    fixtures:  `<button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
+    fixtures:  `<button class="btn btn-ghost" onclick="openModal('add-fixture-modal')">+ Schedule Fixture</button><button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
     teams:     `<button class="btn btn-gold" onclick="openModal('add-team-modal')">+ Add Team</button>`,
     players:   `<button class="btn btn-gold" onclick="openModal('add-player-modal')">+ Add Player</button>`,
     standings: ``,
     bracket:   ``,
-    venues:    ``,
+    venues:    `<button class="btn btn-gold" onclick="openModal('add-venue-modal')">+ Add Venue</button>`,
   };
   document.getElementById('topbar-actions').innerHTML = actions[page] || '';
 
@@ -438,8 +386,9 @@ function renderVenuesPage() {
 
 // ── MODAL ──
 function openModal(id) {
-  if(id === 'match-modal') populateMatchModal();
-  if(id === 'add-player-modal') populatePlayerModal();
+  if (id === 'match-modal')       populateMatchModal();
+  if (id === 'add-player-modal')  populatePlayerModal();
+  if (id === 'add-fixture-modal') populateFixtureModal();
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -477,19 +426,32 @@ function updateResultTeams() {
   document.getElementById('result-away-score').value = 0;
 }
 
-function submitResult() {
+async function submitResult() {
   const fid = parseInt(document.getElementById('result-fixture-select').value);
-  const f = fixtures.find(x=>x.id===fid);
-  if(!f) return;
-  const hg = parseInt(document.getElementById('result-home-score').value)||0;
-  const ag = parseInt(document.getElementById('result-away-score').value)||0;
-  const vid = parseInt(document.getElementById('result-venue-select').value);
-  f.hg = hg; f.ag = ag; f.status = 'played'; f.venue = vid;
-  closeModal('match-modal');
-  recalcTeamStats();
-  showToast(`✅ Result recorded: ${getTeam(f.home).name} ${hg}–${ag} ${getTeam(f.away).name}`);
-  renderDashboard();
-  renderFixturesPage();
+  const f = fixtures.find(x => x.id === fid);
+  if (!f) return;
+  const hg = parseInt(document.getElementById('result-home-score').value) || 0;
+  const ag = parseInt(document.getElementById('result-away-score').value) || 0;
+
+  try {
+    const res = await fetch(`/api/fixtures/${fid}/result`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        home_goals:  hg,
+        away_goals:  ag,
+        referee_id:  _user.user_id || 1
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    closeModal('match-modal');
+    showToast(`✅ Result recorded: ${getTeam(f.home).name} ${hg}–${ag} ${getTeam(f.away).name}`);
+    await loadAllData();   // refresh everything from DB
+  } catch (err) {
+    showToast('❌ Failed to save result', true);
+    console.error(err);
+  }
 }
 
 function populatePlayerModal() {
@@ -497,31 +459,119 @@ function populatePlayerModal() {
   sel.innerHTML = teams.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
 }
 
-function addTeam() {
-  const name = document.getElementById('new-team-name').value.trim();
+async function addTeam() {
+  const name  = document.getElementById('new-team-name').value.trim();
   const group = document.getElementById('new-team-group').value;
   const color = document.getElementById('new-team-color').value;
-  if(!name) { showToast('❌ Enter a team name', true); return; }
-  const emojis = {'#22a050':'🟢','#e8b84b':'🟡','#3b8bd4':'🔵','#e84b4b':'🔴','#a78bfa':'🟣','#f97316':'🟠'};
-  teams.push({ id: teams.length+1, name, group, color, emoji: emojis[color]||'⚽', w:0,d:0,l:0,gf:0,ga:0 });
-  document.getElementById('new-team-name').value = '';
-  closeModal('add-team-modal');
-  showToast(`✅ ${name} added to Group ${group}`);
-  renderTeamsPage();
+  if (!name) { showToast('❌ Enter a team name', true); return; }
+
+  try {
+    const res = await fetch('/api/teams/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, group_name: group, color })
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    document.getElementById('new-team-name').value = '';
+    closeModal('add-team-modal');
+    showToast(`✅ ${name} added to Group ${group}`);
+    await loadAllData();
+  } catch (err) {
+    showToast('❌ Failed to add team', true);
+    console.error(err);
+  }
 }
 
-function addPlayer() {
-  const name = document.getElementById('new-player-name').value.trim();
-  const jersey = parseInt(document.getElementById('new-player-jersey').value)||0;
-  const team = parseInt(document.getElementById('new-player-team').value);
-  const pos = document.getElementById('new-player-pos').value;
-  if(!name) { showToast('❌ Enter a player name', true); return; }
-  players.push({ id: players.length+1, name, jersey, team, pos, goals:0, assists:0, matches:0 });
-  document.getElementById('new-player-name').value = '';
-  document.getElementById('new-player-jersey').value = '';
-  closeModal('add-player-modal');
-  showToast(`✅ ${name} added`);
-  renderPlayersPage();
+async function addPlayer() {
+  const name   = document.getElementById('new-player-name').value.trim();
+  const jersey = parseInt(document.getElementById('new-player-jersey').value) || 0;
+  const team   = parseInt(document.getElementById('new-player-team').value);
+  const pos    = document.getElementById('new-player-pos').value;
+  if (!name) { showToast('❌ Enter a player name', true); return; }
+
+  try {
+    const res = await fetch('/api/players/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, jersey_no: jersey, team_id: team, position: pos })
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    document.getElementById('new-player-name').value = '';
+    document.getElementById('new-player-jersey').value = '';
+    closeModal('add-player-modal');
+    showToast(`✅ ${name} added`);
+    await loadAllData();
+  } catch (err) {
+    showToast('❌ Failed to add player', true);
+    console.error(err);
+  }
+}
+
+// ── ADD VENUE ──
+async function addVenue() {
+  const name     = document.getElementById('new-venue-name').value.trim();
+  const city     = document.getElementById('new-venue-city').value.trim();
+  const capacity = parseInt(document.getElementById('new-venue-capacity').value) || 0;
+  const surface  = document.getElementById('new-venue-surface').value;
+  if (!name || !city) { showToast('❌ Enter venue name and city', true); return; }
+
+  try {
+    const res = await fetch('/api/venues/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, city, capacity, surface })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    document.getElementById('new-venue-name').value = '';
+    document.getElementById('new-venue-city').value = '';
+    document.getElementById('new-venue-capacity').value = '';
+    closeModal('add-venue-modal');
+    showToast(`✅ ${name} added`);
+    await loadAllData();
+  } catch (err) {
+    showToast('❌ Failed to add venue', true);
+    console.error(err);
+  }
+}
+
+// ── ADD FIXTURE ──
+async function addFixture() {
+  const home_team_id  = parseInt(document.getElementById('new-fixture-home').value);
+  const away_team_id  = parseInt(document.getElementById('new-fixture-away').value);
+  const venue_id      = parseInt(document.getElementById('new-fixture-venue').value);
+  const match_date    = document.getElementById('new-fixture-date').value;
+  const match_time    = document.getElementById('new-fixture-time').value || null;
+  const tournament_id = 1;   // single tournament for now
+
+  if (home_team_id === away_team_id) { showToast('❌ Home and away cannot be same team', true); return; }
+  if (!match_date) { showToast('❌ Select a match date', true); return; }
+
+  try {
+    const res = await fetch('/api/fixtures/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tournament_id, home_team_id, away_team_id, venue_id, match_date, match_time })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    closeModal('add-fixture-modal');
+    showToast('✅ Fixture scheduled');
+    await loadAllData();
+  } catch (err) {
+    showToast('❌ Failed to add fixture', true);
+    console.error(err);
+  }
+}
+
+function populateFixtureModal() {
+  const homeEl  = document.getElementById('new-fixture-home');
+  const awayEl  = document.getElementById('new-fixture-away');
+  const venueEl = document.getElementById('new-fixture-venue');
+  homeEl.innerHTML  = teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  awayEl.innerHTML  = teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  venueEl.innerHTML = venues.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+  if (teams.length > 1) awayEl.selectedIndex = 1;
 }
 
 // ── TOAST ──
@@ -535,12 +585,117 @@ function showToast(msg, isError=false) {
   toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
 }
 
-// ── INIT ──
-recalcTeamStats();
-renderDashboard();
+// ── LOGOUT ──
 function logout() {
   localStorage.removeItem('tp_user');
   window.location.href = 'index.html';
 }
 
-applyRoleAccess();
+// ── API HELPERS ──
+async function apiFetch(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`API error: ${path} → ${res.status}`);
+  return res.json();
+}
+
+// ── MAP API RESPONSES TO FRONTEND SHAPE ──
+function mapTeam(t) {
+  const colorEmojiMap = {
+    '#22a050':'🟢','#e8b84b':'🟡','#3b8bd4':'🔵',
+    '#e84b4b':'🔴','#a78bfa':'🟣','#f97316':'🟠'
+  };
+  return {
+    id:    t.team_id,
+    name:  t.name,
+    group: t.group_name,
+    color: t.color,
+    emoji: colorEmojiMap[t.color] || '⚽',
+    w:0, d:0, l:0, gf:0, ga:0   // recalcTeamStats() fills these
+  };
+}
+
+function mapPlayer(p) {
+  return {
+    id:      p.player_id,
+    name:    p.player_name,      // view returns player_name not name
+    jersey:  p.jersey_no,
+    team:    p.team_id,          // now present after view fix
+    pos:     p.position,
+    goals:   p.goals        ?? 0,
+    assists: p.assists       ?? 0,
+    matches: p.matches_played ?? 0
+  };
+}
+
+function mapVenue(v) {
+  const emojiMap = { Natural:'🏟️', Hybrid:'🟢', Artificial:'🏆' };
+  const colorMap = { Karachi:'#1a3a2a', Lahore:'#2a2a1a', Rawalpindi:'#1a2a3a', Peshawar:'#2a1a3a' };
+  return {
+    id:       v.venue_id,
+    name:     v.name,
+    city:     v.city,
+    capacity: v.capacity,
+    grass:    v.surface,
+    emoji:    emojiMap[v.surface] || '🏟️',
+    color:    colorMap[v.city]    || '#1a2a1a'
+  };
+}
+
+function mapFixture(m) {
+  return {
+    id:        m.match_id,
+    home:      m.home_team_id,   // now present after view fix
+    away:      m.away_team_id,
+    home_name: m.home_team,      // keep names too for display fallback
+    away_name: m.away_team,
+    hg:        m.home_goals  ?? null,
+    ag:        m.away_goals  ?? null,
+    venue:     m.venue_id,
+    venue_name: m.venue_name,
+    date:      m.match_date  ? String(m.match_date).slice(5).replace('-', ' ') : '—',
+    status:    m.status,
+    min:       null
+  };
+}
+
+// ── INIT ──
+async function loadAllData() {
+  try {
+    const [rawTeams, rawPlayers, rawVenues, rawFixtures, rawStandings] = await Promise.all([
+      apiFetch('/api/teams/'),
+      apiFetch('/api/players/'),
+      apiFetch('/api/venues/'),
+      apiFetch('/api/fixtures/'),
+      apiFetch('/api/standings/')
+    ]);
+
+    teams    = rawTeams.map(mapTeam);
+    players  = rawPlayers.map(mapPlayer);
+    venues   = rawVenues.map(mapVenue);
+    fixtures = rawFixtures.map(mapFixture);
+
+    // Merge standings (W/D/L/GF/GA) into teams array from DB instead of recalculating locally
+    rawStandings.forEach(s => {
+      const t = teams.find(t => t.id === s.team_id);
+      if (t) {
+        t.w  = s.won;
+        t.d  = s.drawn;
+        t.l  = s.lost;
+        t.gf = s.goals_for;
+        t.ga = s.goals_against;
+      }
+    });
+
+  } catch (err) {
+    console.error('Failed to load data:', err);
+    showToast('❌ Could not connect to server', true);
+  }
+}
+
+// Called once on first load only — navigates to landing page
+async function initApp() {
+  await loadAllData();
+  applyRoleAccess();
+}
+
+initApp();

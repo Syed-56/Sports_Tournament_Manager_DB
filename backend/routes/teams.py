@@ -1,12 +1,12 @@
 ﻿from flask import Blueprint, jsonify, request
-from db import get_db
+from backend.db import get_db
 
 teams_bp = Blueprint('teams', __name__)
 
 @teams_bp.route('/', methods=['GET'])
 def get_teams():
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor()
     cursor.execute("SELECT * FROM Team")
     teams = cursor.fetchall()
     cursor.close()
@@ -15,7 +15,7 @@ def get_teams():
 @teams_bp.route('/<int:id>', methods=['GET'])
 def get_teams_by_id(id):
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor()
     cursor.execute("SELECT * FROM Team WHERE team_id = %s", (id,))
     team = cursor.fetchone()
     cursor.close()

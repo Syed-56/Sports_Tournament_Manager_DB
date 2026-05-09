@@ -1,36 +1,25 @@
-﻿from flask import Blueprint, jsonify, request
-from db import get_db
+﻿from flask import Blueprint, jsonify
+from backend.db import get_db
 
 standings_bp = Blueprint('standings', __name__)
 
 @standings_bp.route('/', methods=['GET'])
 def get_standings():
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT s.*, t.name as team_name 
-        FROM Standings s
-        JOIN Team t ON s.team_id = t.team_id
-        ORDER BY s.won DESC, s.goal_diff DESC
-    """)
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM vw_group_standings")
     standings = cursor.fetchall()
     cursor.close()
     return jsonify(standings)
 
-@standings_bp.route('/<int:id>', methods=['GET'])
-def get_standings_by_id(id):
+@standings_bp.route('/group/<group>', methods=['GET'])
+def get_standings_by_group(group):
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT s.*, t.name as team_name 
-        FROM Standings s
-        JOIN Team t ON s.team_id = t.team_id
-        WHERE s.standing_id = %s
-    """, (id,))
-    standing = cursor.fetchone()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT * FROM vw_group_standings WHERE group_name = %s",
+        (group.upper(),)
+    )
+    standings = cursor.fetchall()
     cursor.close()
-    if standing:
-        return jsonify(standing)
-    return jsonify({'message': 'Standing not found'}), 404
-
-
+    return jsonify(standings)

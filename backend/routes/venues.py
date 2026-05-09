@@ -1,12 +1,12 @@
 ﻿from flask import Blueprint, jsonify, request
-from db import get_db
+from backend.db import get_db
 
 venues_bp = Blueprint('venues', __name__)
 
 @venues_bp.route('/', methods=['GET'])
 def get_venues():
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor()
     cursor.execute("SELECT * FROM Venue")
     venues = cursor.fetchall()
     cursor.close()
@@ -15,7 +15,7 @@ def get_venues():
 @venues_bp.route('/<int:id>', methods=['GET'])
 def get_venues_by_id(id):
     db = get_db()
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor()
     cursor.execute("SELECT * FROM Venue WHERE venue_id = %s", (id,))
     venue = cursor.fetchone()
     cursor.close()

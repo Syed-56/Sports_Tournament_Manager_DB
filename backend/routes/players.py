@@ -1,22 +1,23 @@
 ﻿from flask import Blueprint, jsonify, request
-from db import get_db
+from backend.db import get_db
 
 players_bp = Blueprint('players', __name__)
 
 @players_bp.route('/', methods=['GET'])
 def get_players():
+    """Returns players with goals/assists/matches from the view."""
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Player")
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM vw_top_scorers")
     players = cursor.fetchall()
     cursor.close()
     return jsonify(players)
 
 @players_bp.route('/<int:id>', methods=['GET'])
-def get_players_by_id(id):
+def get_player_by_id(id):
     db = get_db()
-    cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Player WHERE player_id = %s", (id,))
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM vw_top_scorers WHERE player_id = %s", (id,))
     player = cursor.fetchone()
     cursor.close()
     if player:
@@ -24,7 +25,7 @@ def get_players_by_id(id):
     return jsonify({'message': 'Player not found'}), 404
 
 @players_bp.route('/', methods=['POST'])
-def create_players():
+def create_player():
     data = request.json
     db = get_db()
     cursor = db.cursor()
@@ -39,5 +40,3 @@ def create_players():
         return jsonify({'message': str(e)}), 400
     finally:
         cursor.close()
-
-

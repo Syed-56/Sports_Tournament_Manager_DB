@@ -232,13 +232,47 @@ function goBack() {
   document.getElementById('step-role').style.display = 'block';
 }
 
-function doLogin() {
+async function doLogin() {
   const name = document.getElementById('input-name').value.trim();
   const pass = document.getElementById('input-password').value;
   if (!name) { document.getElementById('input-name').focus(); return; }
   if (!pass)  { document.getElementById('input-password').focus(); return; }
-  localStorage.setItem('tp_user', JSON.stringify({ name, role: selectedRole }));
-  window.location.href = 'mainPage.html';
+
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, password: pass, role: selectedRole })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('tp_user', JSON.stringify(data.user));
+      window.location.href = 'mainPage.html';
+    } else {
+      showLoginError(data.message || 'Invalid credentials');
+    }
+  } catch (err) {
+    showLoginError('Cannot reach server. Is Flask running?');
+  } finally {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+  }
+}
+
+function showLoginError(msg) {
+  let el = document.getElementById('login-error');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'login-error';
+    el.style.cssText = 'color:#e84b4b;font-size:12px;text-align:center;margin-top:10px;font-weight:600;';
+    document.querySelector('.detail-body').appendChild(el);
+  }
+  el.textContent = '❌ ' + msg;
 }
 </script>
 </body>

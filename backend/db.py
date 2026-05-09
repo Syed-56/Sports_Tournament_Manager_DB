@@ -1,13 +1,17 @@
-import mysql.connector
+import pymysql
+import pymysql.cursors
 from flask import g
 
 def get_db():
     if 'db' not in g:
-        g.db = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="",  # Update this as needed
-            database="tournapro"
+        g.db = pymysql.connect(
+            host        = 'localhost',
+            user        = 'root',
+            password    = 'sultan-rayyan-hamza',
+            database    = 'tournapro',
+            charset     = 'utf8mb4',
+            cursorclass = pymysql.cursors.DictCursor,
+            autocommit  = False
         )
     return g.db
 

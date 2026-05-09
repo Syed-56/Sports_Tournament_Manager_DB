@@ -317,6 +317,86 @@
   </div>
 </div>
 
+<!-- ── MODAL: Add Venue ── -->
+<div class="modal-overlay" id="add-venue-modal" onclick="closeModalOutside(event, 'add-venue-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏟️ Add New Venue</div>
+      <button class="modal-close" onclick="closeModal('add-venue-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Venue Name</label>
+          <input class="form-input" id="new-venue-name" placeholder="e.g. National Stadium">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" id="new-venue-city" placeholder="e.g. Karachi">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Capacity</label>
+          <input class="form-input" id="new-venue-capacity" type="number" placeholder="e.g. 30000" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Surface</label>
+          <select class="form-select" id="new-venue-surface">
+            <option value="Natural">Natural</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Artificial">Artificial</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-venue-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addVenue()">Add Venue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL: Schedule Fixture ── -->
+<div class="modal-overlay" id="add-fixture-modal" onclick="closeModalOutside(event, 'add-fixture-modal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📅 Schedule Fixture</div>
+      <button class="modal-close" onclick="closeModal('add-fixture-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Home Team</label>
+          <select class="form-select" id="new-fixture-home"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Away Team</label>
+          <select class="form-select" id="new-fixture-away"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Venue</label>
+        <select class="form-select" id="new-fixture-venue"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" id="new-fixture-date" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time (optional)</label>
+          <input class="form-input" id="new-fixture-time" type="time">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-fixture-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addFixture()">Schedule</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span id="toast-msg">✅ Saved successfully</span>
