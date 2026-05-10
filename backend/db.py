@@ -5,13 +5,14 @@ from flask import g
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
-            host        = 'localhost',
+            host        = '127.0.0.1',
             user        = 'root',
-            password    = 'sultan-rayyan-hamza',
+            password    = 'sultan10',
             database    = 'tournapro',
             charset     = 'utf8mb4',
             cursorclass = pymysql.cursors.DictCursor,
-            autocommit  = False
+            autocommit  = False,
+            ssl_disabled= True
         )
     return g.db
 

@@ -163,7 +163,6 @@ function scorerHTML(p, rank) {
 
 // ── NAVIGATE ──
 let currentGroup = 'A';
-
 function navigate(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -184,12 +183,19 @@ function navigate(page, el) {
   const actions = {
     dashboard: `<button class="btn btn-ghost" onclick="showToast('📤 Export coming soon')">📤 Export</button>
                 <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
-    fixtures:  `<button class="btn btn-ghost" onclick="openModal('add-fixture-modal')">+ Schedule Fixture</button><button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
-    teams:     `<button class="btn btn-gold" onclick="openModal('add-team-modal')">+ Add Team</button>`,
-    players:   `<button class="btn btn-gold" onclick="openModal('add-player-modal')">+ Add Player</button>`,
+    fixtures:  `<button class="btn btn-ghost" onclick="openModal('add-fixture-modal')">+ Schedule Fixture</button>
+                <button class="btn btn-gold" onclick="openModal('match-modal')">+ Record Result</button>`,
+    teams:     _user.role === 'admin'
+                 ? `<button class="btn btn-gold" onclick="openModal('add-team-modal')">+ Add Team</button>`
+                 : ``,
+    players:   (_user.role === 'admin' || _user.role === 'captain')
+                 ? `<button class="btn btn-gold" onclick="openModal('add-player-modal')">+ Add Player</button>`
+                 : ``,
     standings: ``,
     bracket:   ``,
-    venues:    `<button class="btn btn-gold" onclick="openModal('add-venue-modal')">+ Add Venue</button>`,
+    venues:    _user.role === 'admin'
+                 ? `<button class="btn btn-gold" onclick="openModal('add-venue-modal')">+ Add Venue</button>`
+                 : ``,
   };
   document.getElementById('topbar-actions').innerHTML = actions[page] || '';
 
@@ -201,7 +207,6 @@ function navigate(page, el) {
   if(page === 'players')    renderPlayersPage();
   if(page === 'venues')     renderVenuesPage();
 }
-
 // ── DASHBOARD ──
 function renderDashboard() {
   recalcTeamStats();
@@ -317,13 +322,18 @@ function renderTeamsPage() {
         <div class="team-divider"></div>
         <div class="team-stat"><div class="team-stat-val" style="color:var(--red)">${t.l}</div><div class="team-stat-lbl">L</div></div>
         <div class="team-divider"></div>
-        <div class="team-stat"><div class="team-stat-val" style="color:${gd>=0?'var(--green-light)':'var(--red)'}">${gd>=0?'+':''}${gd}</div><div class="team-stat-lbl">GD</div></div>
+        <div class="team-stat"><div class="team-stat-val" style="color:${gd>=0?'var(--green-light)':'var(--red)'}">
+          ${gd>=0?'+':''}${gd}</div><div class="team-stat-lbl">GD</div></div>
       </div>
     </div>`;
   }).join('') || `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👥</div><div class="empty-text">No teams found</div></div>`;
+
   document.getElementById('team-count-badge').textContent = teams.length;
-  document.querySelector('[onclick*="add-team-modal"]').style.display =
-    _user.role === 'admin' ? '' : 'none';
+
+  // Hide Add Team button everywhere for non-admins
+  document.querySelectorAll('[onclick*="add-team-modal"]').forEach(btn => {
+    btn.style.display = _user.role === 'admin' ? '' : 'none';
+  });
 }
 
 // ── PLAYERS PAGE ──
@@ -457,6 +467,14 @@ async function submitResult() {
 function populatePlayerModal() {
   const sel = document.getElementById('new-player-team');
   sel.innerHTML = teams.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  if (_user.role === 'captain') {
+        // Lock the Add Player modal's team selector to their own team
+        const teamSel = document.getElementById('new-player-team');
+        [...teamSel.options].forEach(opt => {
+            if (parseInt(opt.value) !== _user.team_id) opt.disabled = true;
+        });
+        teamSel.value = _user.team_id;
+  }
 }
 
 async function addTeam() {
@@ -484,6 +502,7 @@ async function addTeam() {
 }
 
 async function addPlayer() {
+  
   const name   = document.getElementById('new-player-name').value.trim();
   const jersey = parseInt(document.getElementById('new-player-jersey').value) || 0;
   const team   = parseInt(document.getElementById('new-player-team').value);
@@ -494,8 +513,14 @@ async function addPlayer() {
     const res = await fetch('/api/players/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, jersey_no: jersey, team_id: team, position: pos })
-    });
+      body: JSON.stringify({
+          name,
+          jersey_no: jersey,
+          team_id:   team,
+          position:  pos,
+          caller_role:    _user.role,       
+          caller_team_id: _user.team_id
+      })    });
     if (!res.ok) throw new Error(await res.text());
 
     document.getElementById('new-player-name').value = '';
