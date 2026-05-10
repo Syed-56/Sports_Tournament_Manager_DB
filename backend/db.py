@@ -13,7 +13,6 @@ def get_db():
         charset     = 'utf8mb4',
         cursorclass = pymysql.cursors.DictCursor,
         autocommit  = False,
-        ssl_disabled= True
     )
     return g.db
 
