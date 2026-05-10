@@ -8,7 +8,7 @@ CREATE TABLE Tournament (
     status          ENUM('upcoming','active','completed') DEFAULT 'upcoming'
 );
 
---Venue
+-- Venue
 CREATE TABLE Venue (
     venue_id        INT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE Venue (
     surface         ENUM('Natural','Hybrid','Artificial') NOT NULL
 );
 
---Team
+-- Team
 CREATE TABLE Team (
     team_id         INT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL UNIQUE,
@@ -25,7 +25,7 @@ CREATE TABLE Team (
     group_name      CHAR(1)         NOT NULL   -- 'A' or 'B'
 );
 
---TOURNAMENT_TEAM (junction, Team enrolled in Tournament)
+-- TOURNAMENT_TEAM (junction, Team enrolled in Tournament)
 CREATE TABLE Tournament_Team (
     tournament_id   INT NOT NULL,
     team_id         INT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE Tournament_Team (
     FOREIGN KEY (team_id)       REFERENCES Team(team_id)
 );
 
---PLAYER
+-- PLAYER
 CREATE TABLE Player (
     player_id       INT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE Player (
     UNIQUE (team_id, jersey_no)     -- no duplicate jersey in same team
 );
 
---USER 
+-- USER 
 CREATE TABLE User (
     user_id         INT AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100)    NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE User (
 );
 
 
---MATCH 
+-- MATCH 
 CREATE TABLE T_Match (
     match_id        INT AUTO_INCREMENT PRIMARY KEY,
     tournament_id   INT             NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE T_Match (
     CHECK (home_team_id <> away_team_id)
 );
 
---RESULT 
+-- RESULT 
 CREATE TABLE Result (
     result_id       INT AUTO_INCREMENT PRIMARY KEY,
     match_id        INT             NOT NULL UNIQUE,  -- one result per match
@@ -85,7 +85,7 @@ CREATE TABLE Result (
     FOREIGN KEY (recorded_by)   REFERENCES User(user_id)
 );
 
---STANDINGS 
+-- STANDINGS 
 CREATE TABLE Standings (
     standing_id     INT AUTO_INCREMENT PRIMARY KEY,
     tournament_id   INT             NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE Standings (
     FOREIGN KEY (team_id)       REFERENCES Team(team_id)
 );
 
---GOAL 
+-- GOAL 
 CREATE TABLE Goal (
     goal_id         INT AUTO_INCREMENT PRIMARY KEY,
     match_id        INT             NOT NULL,
