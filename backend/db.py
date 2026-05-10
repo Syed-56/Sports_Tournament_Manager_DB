@@ -1,19 +1,19 @@
 import pymysql
 import pymysql.cursors
 from flask import g
+import os
 
 def get_db():
-    if 'db' not in g:
-        g.db = pymysql.connect(
-            host        = '127.0.0.1',
-            user        = 'root',
-            password    = 'sultan10',
-            database    = 'tournapro',
-            charset     = 'utf8mb4',
-            cursorclass = pymysql.cursors.DictCursor,
-            autocommit  = False,
-            ssl_disabled= True
-        )
+    g.db = pymysql.connect(
+        host     = os.environ.get('DB_HOST', '127.0.0.1'),
+        user     = os.environ.get('DB_USER', 'root'),
+        password = os.environ.get('DB_PASSWORD', 'sultan10'),
+        database = os.environ.get('DB_NAME', 'tournapro'),
+        charset     = 'utf8mb4',
+        cursorclass = pymysql.cursors.DictCursor,
+        autocommit  = False,
+        ssl_disabled= True
+    )
     return g.db
 
 def close_db(e=None):

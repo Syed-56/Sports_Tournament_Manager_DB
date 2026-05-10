@@ -1,6 +1,6 @@
 from flask import Flask, send_from_directory
 from backend.db import close_db
-
+import os
 from backend.routes.auth     import auth_bp
 from backend.routes.fixtures import fixtures_bp
 from backend.routes.players  import players_bp
@@ -33,4 +33,5 @@ def main_page():
 app.teardown_appcontext(close_db)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
