@@ -9,6 +9,7 @@ def get_db():
         user     = os.environ.get('DB_USER', 'root'),
         password = os.environ.get('DB_PASSWORD', 'sultan10'),
         database = os.environ.get('DB_NAME', 'tournapro'),
+        port = int(os.environ.get('DB_PORT', 3306)),
         charset     = 'utf8mb4',
         cursorclass = pymysql.cursors.DictCursor,
         autocommit  = False,
