@@ -1,28 +1,19 @@
--- ============================================================
+
 --  run-once.sql  –  TournaPro seed data
 --  Run this ONCE after schema.sql has been executed.
--- ============================================================
-USE tournapro;
 
--- ────────────────────────────────────────────────────────────
 --  1. TOURNAMENT
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Tournament (tournament_id, name, season, start_date, end_date, status)
 VALUES (1, 'Spring Cup 2026', '2026', '2026-03-01', '2026-05-31', 'active');
 
 
--- ────────────────────────────────────────────────────────────
 --  2. VENUES
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Venue (venue_id, name, city, capacity, surface) VALUES
 (1, 'National Stadium',    'Karachi',   55000, 'Natural'),
 (2, 'City Sports Complex', 'Lahore',    30000, 'Artificial'),
 (3, 'Green Arena',         'Islamabad', 20000, 'Hybrid');
 
-
--- ────────────────────────────────────────────────────────────
 --  3. TEAMS
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Team (team_id, name, color, group_name) VALUES
 (1, 'Karachi Kings',     '#1A73E8', 'A'),
 (2, 'Lahore Lions',      '#E53935', 'A'),
@@ -34,9 +25,7 @@ INSERT IGNORE INTO Team (team_id, name, color, group_name) VALUES
 (8, 'Sialkot Eagles',    '#6D4C41', 'B');
 
 
--- ────────────────────────────────────────────────────────────
 --  4. ENROLL TEAMS IN TOURNAMENT + INIT STANDINGS
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Tournament_Team (tournament_id, team_id) VALUES
 (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8);
 
@@ -44,9 +33,7 @@ INSERT IGNORE INTO Standings (tournament_id, team_id) VALUES
 (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8);
 
 
--- ────────────────────────────────────────────────────────────
 --  5. PLAYERS  (5 per team)
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Player (player_id, name, jersey_no, position, team_id) VALUES
 (1,  'Ali Raza',         10, 'FW', 1),
 (2,  'Usman Tariq',       7, 'MF', 1),
@@ -90,7 +77,6 @@ INSERT IGNORE INTO Player (player_id, name, jersey_no, position, team_id) VALUES
 (40, 'Iftikhar Ahmed',    9, 'FW', 8);
 
 
--- ────────────────────────────────────────────────────────────
 --  6. USERS
 --  Passwords are re-hashed at runtime via generate_hashes.py.
 --  To create users with REAL hashes, run:
@@ -100,7 +86,6 @@ INSERT IGNORE INTO Player (player_id, name, jersey_no, position, team_id) VALUES
 --
 --  The admin hash below is the original from the project.
 --  Referees & captains use a placeholder — replace before prod.
--- ────────────────────────────────────────────────────────────
 
 -- Admin (password: sultan-rayyan-hamza)
 INSERT IGNORE INTO User (user_id, name, password_hash, role, team_id) VALUES
@@ -125,9 +110,7 @@ INSERT IGNORE INTO User (user_id, name, password_hash, role, team_id) VALUES
 SELECT user_id, name, role, team_id FROM User;
 
 
--- ────────────────────────────────────────────────────────────
 --  7. MATCHES  (12 group-stage played + 2 upcoming semi-finals)
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO T_Match
   (match_id, tournament_id, home_team_id, away_team_id, venue_id, match_date, match_time, status)
 VALUES
@@ -150,10 +133,8 @@ VALUES
 (14, 1, 2, 6, 1, '2026-04-10', '18:00:00', 'upcoming');
 
 
--- ────────────────────────────────────────────────────────────
 --  8. RESULTS  (trigger updates Standings automatically)
 --     recorded_by = 2 (Referee Ahmed)  or  3 (Referee Bilal)
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Result (match_id, home_goals, away_goals, recorded_by) VALUES
 -- Group A results
 (1,  3, 1, 2),   -- KK 3-1 LL
@@ -170,10 +151,7 @@ INSERT IGNORE INTO Result (match_id, home_goals, away_goals, recorded_by) VALUES
 (11, 4, 1, 3),   -- IU 4-1 SE
 (12, 1, 2, 3);   -- MS 1-2 FW
 
-
--- ────────────────────────────────────────────────────────────
 --  9. GOALS  (powers vw_top_scorers)
--- ────────────────────────────────────────────────────────────
 INSERT IGNORE INTO Goal (match_id, player_id, minute, is_own_goal, is_assist) VALUES
 -- Match 1 KK 3-1 LL
 (1,  1,  12, FALSE, FALSE),
@@ -229,9 +207,7 @@ INSERT IGNORE INTO Goal (match_id, player_id, minute, is_own_goal, is_assist) VA
 (12, 35, 82, FALSE, FALSE);
 
 
--- ────────────────────────────────────────────────────────────
 --  VERIFY
--- ────────────────────────────────────────────────────────────
 SELECT 'Users'      AS entity, COUNT(*) AS total FROM User
 UNION ALL SELECT 'Teams',     COUNT(*) FROM Team
 UNION ALL SELECT 'Players',   COUNT(*) FROM Player
